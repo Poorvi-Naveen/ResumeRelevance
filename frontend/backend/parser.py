@@ -1,11 +1,10 @@
-
 """
 Person 1: Resume & JD parsing utilities
 File: person1_resume_parsing.py
 
 Functions provided (public API):
-- parse_resume(file_path) -> dict
-- parse_jd(file_path) -> dict
+- parse_resume(file_object) -> dict
+- parse_jd(file_object) -> dict
 
 This module implements robust extraction from PDF / DOCX / TXT using PyMuPDF and docx2txt,
 section segmentation by heuristics, and lightweight skill/education/experience parsing.
@@ -77,6 +76,8 @@ def _extract_text_from_pdf(file_stream) -> str:
     """Extracts text from a PDF file stream."""
     text = ""
     try:
+        # Reset file pointer to beginning
+        file_stream.seek(0)
         doc = fitz.open(stream=file_stream.read(), filetype="pdf")
         for page in doc:
             text += page.get_text()
@@ -89,6 +90,8 @@ def _extract_text_from_pdf(file_stream) -> str:
 def _extract_text_from_docx(file_stream) -> str:
     """Extracts text from a DOCX file stream."""
     try:
+        # Reset file pointer to beginning
+        file_stream.seek(0)
         text = docx2txt.process(file_stream)
     except Exception as e:
         logger.error(f"Error extracting text from DOCX: {e}")
@@ -142,16 +145,20 @@ def _fallback_skill_search(text: str) -> List[str]:
             found.add(keyword)
     return list(found)
 
-def parse_resume(file_stream) -> Dict[str, any]:
+def parse_resume(file_object) -> Dict[str, any]:
     """Parses a resume file and returns a structured dictionary."""
-    filename = file_stream.filename
+    # Get filename from the file object (works with both Streamlit and regular files)
+    filename = getattr(file_object, 'name', getattr(file_object, 'filename', 'unknown'))
+    
     text = ""
     if filename.endswith('.pdf'):
-        text = _extract_text_from_pdf(file_stream)
+        text = _extract_text_from_pdf(file_object)
     elif filename.endswith('.docx'):
-        text = _extract_text_from_docx(file_stream)
+        text = _extract_text_from_docx(file_object)
     elif filename.endswith('.txt'):
-        text = _clean_text(file_stream.read().decode('utf-8'))
+        # Reset file pointer to beginning
+        file_object.seek(0)
+        text = _clean_text(file_object.read().decode('utf-8'))
     else:
         raise ValueError("Unsupported file type")
 
@@ -194,16 +201,20 @@ def parse_resume(file_stream) -> Dict[str, any]:
         }
     }
 
-def parse_jd(file_stream) -> Dict[str, any]:
+def parse_jd(file_object) -> Dict[str, any]:
     """Parses a job description file and returns a structured dictionary."""
-    filename = file_stream.filename
+    # Get filename from the file object (works with both Streamlit and regular files)
+    filename = getattr(file_object, 'name', getattr(file_object, 'filename', 'unknown'))
+    
     text = ""
     if filename.endswith('.pdf'):
-        text = _extract_text_from_pdf(file_stream)
+        text = _extract_text_from_pdf(file_object)
     elif filename.endswith('.docx'):
-        text = _extract_text_from_docx(file_stream)
+        text = _extract_text_from_docx(file_object)
     elif filename.endswith('.txt'):
-        text = _clean_text(file_stream.read().decode('utf-8'))
+        # Reset file pointer to beginning
+        file_object.seek(0)
+        text = _clean_text(file_object.read().decode('utf-8'))
     else:
         raise ValueError("Unsupported file type")
     
@@ -323,10 +334,14 @@ if __name__ == '__main__':
     class MockFile:
         def __init__(self, content):
             self.content = content.encode('utf-8')
-            self.filename = "mock.pdf"
-        
+            self.name = "mock.pdf"  # Changed from filename to name
+            self.filename = "mock.pdf"  # Keep for compatibility
+            
         def read(self):
             return self.content
+            
+        def seek(self, position):
+            pass
             
     mock_file = MockFile(sample_jd_text)
     
