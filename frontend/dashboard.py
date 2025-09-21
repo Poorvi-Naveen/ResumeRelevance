@@ -35,7 +35,42 @@ st.markdown("""
 
 # --- Helper function (unchanged) ---
 def display_candidate_report(row):
-    # ... (keep existing implementation) ...
+    with st.container():
+        st.markdown(f"#### {row['name']}")
+        st.markdown("---")
+        
+        # MODIFIED: Changed to 4 columns to include Semantic Score
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Overall Score", f"{row.get('score', 0)}%")
+        col2.metric("Verdict", row.get('verdict', 'N/A'))
+        col3.metric("Keyword Match", f"{row.get('hard_match_pct', 'N/A')}%")
+        # NEW: Added Semantic Match metric
+        col4.metric("Semantic Match", f"{row.get('semantic_pct', 'N/A')}%")
+
+        with st.expander("View Detailed Analysis"):
+            if row['verdict'] == 'Error':
+                st.error(f"Could not process this resume. Server feedback: {row.get('feedback', 'No details provided.')}")
+            else:
+                st.info(f"**AI Feedback:** {row.get('feedback', 'No feedback available.')}")
+                
+                st.subheader("✅ Matched Skills")
+                matched_must = row.get('matched_must_have', [])
+                matched_good = row.get('matched_good_to_have', [])
+                if not matched_must and not matched_good:
+                    st.write("No direct skill matches found.")
+                else:
+                    if matched_must: st.markdown(" ".join(f"<span style='background-color:#1E88E5;color:white;padding:5px 10px;border-radius:5px;margin:2px;'>{s}</span>" for s in matched_must), unsafe_allow_html=True)
+                    if matched_good: st.markdown(" ".join(f"<span style='background-color:#43A047;color:white;padding:5px 10px;border-radius:5px;margin:2px;'>{s}</span>" for s in matched_good), unsafe_allow_html=True)
+
+                st.subheader("❌ Missing Skills")
+                missing_must = row.get('missing_must_have', [])
+                missing_good = row.get('missing_good_to_have', [])
+                if not missing_must and not missing_good:
+                    st.write("No missing skills detected.")
+                else:
+                    if missing_must: st.markdown(" ".join(f"<span style='background-color:#E53935;color:white;padding:5px 10px;border-radius:5px;margin:2px;'>{s}</span>" for s in missing_must), unsafe_allow_html=True)
+                    if missing_good: st.markdown(" ".join(f"<span style='background-color:#FDD835;color:black;padding:5px 10px;border-radius:5px;margin:2px;'>{s}</span>" for s in missing_good), unsafe_allow_html=True)
+
 
 # --- Main App ---
     st.title("📄 Automated Resume Relevance Checker")
@@ -196,6 +231,7 @@ if "analysis_results" in st.session_state:
     else:
         st.info("👈 **Get started by uploading a Job Description and resumes, or search previous results.**")
         st.image("https://i.imgur.com/tIO5UeA.png", caption="System Architecture Overview")
+
 
 
 
