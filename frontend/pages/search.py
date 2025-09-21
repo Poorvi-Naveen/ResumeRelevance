@@ -1,64 +1,37 @@
-# frontend/pages/search.py
-
 import streamlit as st
 import pandas as pd
-import requests # Use requests to call the API
+from backend.database import get_results, search_results
 
-# Get the backend URL from Streamlit's secrets
-API_URL = st.secrets["API_URL"]
+st.set_page_config(page_title="Search Results", layout="wide")
 
-st.set_page_config(page_title="Resume Database Search", layout="wide")
-st.title("📂 Resume Database Search & Filter")
+st.title("🔍 Search Previous Analysis Results")
 
-# --- Load data from the backend API ---
-@st.cache_data
-def load_data():
-    try:
-        # Call the new '/api/results' endpoint on your backend
-        response = requests.get(f"{API_URL}/api/results")
-        response.raise_for_status()  # Raise an exception for bad status codes
-        data = response.json()
-        return pd.DataFrame(data)
-    except requests.exceptions.RequestException as e:
-        st.error(f"Error loading data from backend: {e}")
-        return pd.DataFrame()
+# Search controls
+search_type = st.radio("Search by:", ["Job Role", "Resume Name", "Location"], horizontal=True)
+search_query = st.text_input("Enter search term:")
 
-df = load_data()
-
-if not df.empty:
-    # --- Sidebar filters (this part remains the same) ---
-    with st.sidebar:
-        st.header("🔍 Filters")
-        job_roles = df["jd_job_role"].dropna().unique().tolist()
-        selected_roles = st.multiselect("Job Role", job_roles, default=job_roles)
-        score_min, score_max = st.slider("Score Range", 0, 100, (50, 100))
-        locations = df["jd_location"].dropna().unique().tolist()
-        selected_locations = st.multiselect("Location", locations, default=locations)
-
-    # --- Apply filters (this part remains the same) ---
-    filtered_df = df[
-        (df["jd_job_role"].isin(selected_roles)) &
-        (df["relevance_score"].between(score_min, score_max)) &
-        (df["jd_location"].isin(selected_locations))
-    ]
-
-    st.success(f"Showing {len(filtered_df)} matching candidates")
-    st.dataframe(filtered_df)
-
-    st.subheader("📋 Candidate Profiles")
-    for _, row in filtered_df.iterrows():
-        # --- IMPORTANT: Build the resume URL using the API_URL ---
-        resume_url = f"{API_URL}{row['resume_url']}"
-        st.markdown(f"""
-        #### Candidate ID: {row['id']}
-        - **Job Role**: {row['jd_job_role']}
-        - **Score**: {row['relevance_score']}%
-        - **Location**: {row['jd_location']}
-        - [📂 Open Resume]({resume_url})
-        - ⏰ Added on: {row['timestamp']}
-        ---
-        """)
+if st.button("Search"):
+    if search_query:
+        filter_map = {
+            "Job Role": "jd_job_role",
+            "Resume Name": "resume_filename",
+            "Location": "jd_location"
+        }
+        results = search_results(search_query, filter_map[search_type])
+    else:
+        results = get_results()
 else:
-    st.info("No resumes found in the database yet, or there was an error connecting to the backend.")
+    results = get_results()
 
-
+if results:
+    df = pd.DataFrame(results)
+    
+    # Display results without file URLs
+    for _, row in df.iterrows():
+        with st.container():
+            st.markdown(f"### {row['resume_filename']}")
+            st.markdown(f"**Job Role:** {row['jd_job_role']} | **Location:** {row['jd_location']}")
+            st.markdown(f"**Relevance Score:** {row['relevance_score']}%")
+            st.markdown("---")
+else:
+    st.info("No results found. Try a different search term or analyze new resumes.")
