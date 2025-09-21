@@ -8,3 +8,5 @@ python-dotenv
 plotly
 pymupdf
 docx2txt
+scikit-learn
+sentence-transformers
