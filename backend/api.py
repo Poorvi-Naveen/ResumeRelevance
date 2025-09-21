@@ -1,6 +1,7 @@
 # backend/api.py
 from dotenv import load_dotenv
 load_dotenv()
+from .database import create_tables, insert_result, get_results
 import os
 import uuid
 import traceback
@@ -26,6 +27,7 @@ api_bp = Blueprint('api', __name__)
 
 # --- Define API routes on the Blueprint ---
 @api_bp.route('/analyze', methods=['POST'])
+
 def analyze():
     if 'jd' not in request.files or 'resume' not in request.files:
         return jsonify({"error": "Missing 'jd' or 'resume' file in the request"}), 400
@@ -100,7 +102,18 @@ def analyze():
             "error": error_message, "score": 0, "verdict": "Error",
             "feedback": "Could not process files due to an internal error."
         }), 500
+# Add this new route inside backend/api.py, near your other routes
 
+@api_bp.route('/results', methods=['GET'])
+def get_all_results():
+    try:
+        # This calls the existing get_results() function from your database.py
+        results = get_results() 
+        return jsonify(results)
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": "Failed to fetch results from the database."}), 500
+    
 # 5. Register the Blueprint with the app
 app.register_blueprint(api_bp, url_prefix='/api')
 
@@ -117,3 +130,4 @@ def uploaded_file(filename):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+
