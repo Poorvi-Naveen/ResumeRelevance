@@ -28,7 +28,11 @@ def create_tables():
     else:
         print("Table 'analysis_results' already exists.")
 
+
 def insert_result(resume_filename, jd_job_role, jd_location, relevance_score):
+    """
+    Inserts a new analysis result into the database.
+    """
     with engine.connect() as conn:
         stmt = analysis_results_table.insert().values(
             resume_filename=resume_filename,
@@ -38,7 +42,7 @@ def insert_result(resume_filename, jd_job_role, jd_location, relevance_score):
         )
         conn.execute(stmt)
         conn.commit()
-    print(f"Inserted result for {resume_filename} with score {relevance_score}")
+    print(f"Successfully inserted analysis result for {resume_filename} with score {relevance_score}")
 
 def get_results():
     with engine.connect() as conn:
