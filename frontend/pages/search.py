@@ -23,6 +23,7 @@ if st.button("Search"):
 else:
     results = get_results()
 
+
 if results:
     df = pd.DataFrame(results)
     
@@ -35,3 +36,4 @@ if results:
             st.markdown("---")
 else:
     st.info("No results found. Try a different search term or analyze new resumes.")
+
