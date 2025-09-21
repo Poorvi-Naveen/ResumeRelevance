@@ -15,7 +15,7 @@ st.title("📂 Resume Database Search & Filter")
 def load_data():
     try:
         # Call the new '/api/results' endpoint on your backend
-        response = requests.get(f"{API_URL}/api/results")
+        response = requests.get(f"{API_URL}api/results")
         response.raise_for_status()  # Raise an exception for bad status codes
         data = response.json()
         return pd.DataFrame(data)
@@ -60,3 +60,4 @@ if not df.empty:
         """)
 else:
     st.info("No resumes found in the database yet, or there was an error connecting to the backend.")
+
