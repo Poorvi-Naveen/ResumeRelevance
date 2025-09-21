@@ -131,7 +131,8 @@ if "analysis_results" in st.session_state:
     results = st.session_state["analysis_results"]
     if results:
         # ... (keep existing display logic) ...
-else:
-    st.info("👈 **Get started by uploading a Job Description and resumes, or search previous results.**")
-    st.image("https://i.imgur.com/tIO5UeA.png", caption="System Architecture Overview")
+    else:
+        st.info("👈 **Get started by uploading a Job Description and resumes, or search previous results.**")
+        st.image("https://i.imgur.com/tIO5UeA.png", caption="System Architecture Overview")
+
 
