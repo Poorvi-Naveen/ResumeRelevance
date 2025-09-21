@@ -11,3 +11,6 @@ docx2txt
 scikit-learn
 sentence-transformers
 SQLAlchemy
+
+langchain
+langchain-google-genai
