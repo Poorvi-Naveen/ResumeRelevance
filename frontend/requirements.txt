@@ -1,0 +1,16 @@
+Flask
+flask-cors
+gunicorn
+psycopg2-binary
+numpy
+pandas
+python-dotenv
+plotly
+pymupdf
+docx2txt
+scikit-learn
+sentence-transformers
+SQLAlchemy
+
+langchain
+langchain-google-genai
