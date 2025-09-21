@@ -38,8 +38,8 @@ def display_candidate_report(row):
     # ... (keep existing implementation) ...
 
 # --- Main App ---
-st.title("📄 Automated Resume Relevance Checker")
-st.markdown("Upload a Job Description and one or more resumes to get an AI-powered analysis of each candidate's suitability.")
+    st.title("📄 Automated Resume Relevance Checker")
+    st.markdown("Upload a Job Description and one or more resumes to get an AI-powered analysis of each candidate's suitability.")
 
 # --- Sidebar for Uploads and Filters ---
 with st.sidebar:
@@ -134,3 +134,4 @@ if "analysis_results" in st.session_state:
 else:
     st.info("👈 **Get started by uploading a Job Description and resumes, or search previous results.**")
     st.image("https://i.imgur.com/tIO5UeA.png", caption="System Architecture Overview")
+
