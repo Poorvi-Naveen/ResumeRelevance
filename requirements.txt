@@ -7,3 +7,4 @@ pandas
 python-dotenv
 plotly
 pymupdf
+docx2txt
