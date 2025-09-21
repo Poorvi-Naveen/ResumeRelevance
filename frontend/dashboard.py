@@ -106,8 +106,6 @@ if analyze_clicked and jd_file and resume_files:
                     jd_job_role=jd_data.get('job_role', 'Unknown'),
                     jd_location=jd_data.get('location', 'Unknown'),
                     relevance_score=result.get('score', 0),
-                    resume_url=None,
-                    jd_url=None
                 )
                 
                 results.append(result)
@@ -198,6 +196,7 @@ if "analysis_results" in st.session_state:
     else:
         st.info("👈 **Get started by uploading a Job Description and resumes, or search previous results.**")
         st.image("https://i.imgur.com/tIO5UeA.png", caption="System Architecture Overview")
+
 
 
 
