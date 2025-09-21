@@ -86,7 +86,7 @@ if not df.empty:
     st.subheader("📋 Candidate Profiles")
     for _, row in filtered_df.iterrows():
         # Prepend the backend URL to the stored path
-        resume_url = f"http://localhost:5000{row['resume_url']}"
+        resume_url = f"{API_URL}{row['resume_url']}"
         st.markdown(f"""
         #### Candidate ID: {row['id']}
         - **Job Role**: {row['jd_job_role']}
@@ -98,3 +98,4 @@ if not df.empty:
         """)
 else:
     st.info("No resumes found in the database yet.")
+
