@@ -4,26 +4,27 @@ load_dotenv()
 import os
 import uuid
 import traceback
+import gc # <--- CHANGE 1: IMPORT THE GARBAGE COLLECTOR
 from flask import Flask, Blueprint, request, jsonify, send_from_directory, current_app
-
-# import functions
 from .parser import parse_resume, parse_jd
 from .scoring import evaluate_resume_detailed
 from .database import create_tables, insert_result
 from .gen_ai import generate_ai_insights
 
-# import embedding model once
-from sentence_transformers import SentenceTransformer
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")  # loaded once, ~120MB
-
-# --- Flask setup ---
+# 1. Create the main Flask app object
 app = Flask(__name__)
+
+# 2. Set up app configurations
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# 3. Call the function to create database tables on startup
 create_tables()
 
+# 4. Define the Blueprint for your API routes
 api_bp = Blueprint('api', __name__)
 
+# --- Define API routes on the Blueprint ---
 @api_bp.route('/analyze', methods=['POST'])
 def analyze():
     if 'jd' not in request.files or 'resume' not in request.files:
@@ -36,7 +37,6 @@ def analyze():
         return jsonify({"error": "One of the uploaded files is empty"}), 400
 
     try:
-        # --- save with unique names ---
         resume_extension = os.path.splitext(resume_file.filename)[1]
         jd_extension = os.path.splitext(jd_file.filename)[1]
         resume_unique_filename = str(uuid.uuid4()) + resume_extension
@@ -44,18 +44,29 @@ def analyze():
 
         resume_filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], resume_unique_filename)
         jd_filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], jd_unique_filename)
-
-        resume_file.seek(0); resume_file.save(resume_filepath)
-        jd_file.seek(0); jd_file.save(jd_filepath)
-
+        
+        resume_file.seek(0)
+        resume_file.save(resume_filepath)
+        jd_file.seek(0)
+        jd_file.save(jd_filepath)
+        
         resume_url = f"/uploads/{resume_unique_filename}"
         jd_url = f"/uploads/{jd_unique_filename}"
 
-        resume_data = parse_resume(resume_filepath)
-        jd_data = parse_jd(jd_filepath)
+        resume_file.seek(0)
+        jd_file.seek(0)
+        
+        resume_data = parse_resume(resume_file)
+        jd_data = parse_jd(jd_file)
 
-        result = evaluate_resume_detailed(resume_data, jd_data, model=embedding_model)
+        # --- CHANGE 2: CLEAN UP MEMORY AFTER PARSING ---
+        # We no longer need the raw file objects in memory, so we release them.
+        del resume_file
+        del jd_file
+        gc.collect()
+        # ---------------------------------------------
 
+        result = evaluate_resume_detailed(resume_data, jd_data)
         genai_insights = generate_ai_insights(
             resume_text=resume_data.get('text', ''),
             jd_text=jd_data.get('raw_text', ''),
@@ -65,21 +76,21 @@ def analyze():
         result.update(genai_insights)
         result['resume_url'] = resume_url
         result['jd_url'] = jd_url
-
-        resume_filename = getattr(resume_file, 'filename', 'Unknown')
+        
+        resume_filename = getattr(resume_data, 'filename', 'Unknown')
         job_role = jd_data.get('job_role', 'Unknown')
         location = jd_data.get('location', 'Unknown')
         score = result.get('score', 0)
 
         insert_result(
-            resume_filename=resume_filename,
-            jd_job_role=job_role,
-            jd_location=location,
-            relevance_score=score,
-            resume_url=resume_url,
+            resume_filename=resume_filename, 
+            jd_job_role=job_role, 
+            jd_location=location, 
+            relevance_score=score, 
+            resume_url=resume_url, 
             jd_url=jd_url
         )
-
+        
         return jsonify(result)
 
     except Exception as e:
@@ -90,9 +101,10 @@ def analyze():
             "feedback": "Could not process files due to an internal error."
         }), 500
 
-# Register API blueprint
+# 5. Register the Blueprint with the app
 app.register_blueprint(api_bp, url_prefix='/api')
 
+# 6. Add the other routes that were in your old app.py
 @app.route('/')
 def index():
     return "<h1>Resume Checker Backend API is running</h1>"
@@ -101,6 +113,7 @@ def index():
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+# --- This part is for local development only ---
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
