@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import os
 import pages.search
 
-API_URL = "http://127.0.0.1:5000/api"
+API_URL = st.secrets["API_URL"]
 
 st.set_page_config(
     page_title="Resume Relevance Checker",
@@ -116,7 +116,7 @@ if analyze_clicked and jd_file and resume_files:
                 "resume": (file.name, file.read(), file.type)
             }
             try:
-                res = requests.post(f"{API_URL}/analyze", files=files_payload)
+                res = requests.post(f"{API_URL}/api/analyze", files=files_payload)
                 result = res.json()
                 result["name"] = file.name
                 results.append(result)
@@ -204,4 +204,5 @@ if "analysis_results" in st.session_state:
 else:
     st.info("👈 **Get started by uploading a Job Description and resumes, or search previous results.**")
     st.image("https://i.imgur.com/tIO5UeA.png", caption="System Architecture Overview")
+
 
