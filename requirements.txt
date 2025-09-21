@@ -1,25 +1,16 @@
-# Core web & API
-Flask==3.1.2
-flask-cors==6.0.1
-gunicorn==23.0.0
-python-dotenv==1.1.1
+Flask
+flask-cors
+gunicorn
+psycopg2-binary
+numpy
+pandas
+python-dotenv
+plotly
+pymupdf
+docx2txt
+scikit-learn
+sentence-transformers
+SQLAlchemy
 
-# Database
-psycopg2-binary==2.9.10
-SQLAlchemy==2.0.43
-
-# Data processing
-numpy==1.25.2
-pandas==2.3.2
-plotly==6.3.0
-pymupdf==1.26.4
-docx2txt==0.9
-scikit-learn==1.7.2
-
-# NLP / embeddings
-torch==2.8.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
-sentence-transformers==5.1.0
-
-# Langchain & Google Gemini API
-langchain==0.3.27
-langchain-google-genai==2.1.12
+langchain
+langchain-google-genai
