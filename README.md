@@ -58,15 +58,15 @@ A user-friendly interface built with **Streamlit** that allows recruiters to:
 ## Application Preview
 
 ### Main Dashboard & Comparison Chart
-![Main Dashboard](<img width="1311" height="843" alt="image" src="https://github.com/user-attachments/assets/c853cb7f-99a0-4c2b-924f-9c9467d11abf" />
+(<img width="1311" height="843" alt="image" src="https://github.com/user-attachments/assets/c853cb7f-99a0-4c2b-924f-9c9467d11abf" />
 )
 
 ### Detailed Candidate Analysis with GenAI Insights 
-![Detailed Analysis1](<img width="959" height="416" alt="image" src="https://github.com/user-attachments/assets/09eb5cc5-fddc-4610-a318-ca6481fbf375" />)
-![Detailed Analysis2](<img width="1919" height="845" alt="image" src="https://github.com/user-attachments/assets/03c53f8f-8843-463b-a4b2-2a7f9172b5e9" />)
+(<img width="959" height="416" alt="image" src="https://github.com/user-attachments/assets/09eb5cc5-fddc-4610-a318-ca6481fbf375" />)
+(<img width="1919" height="845" alt="image" src="https://github.com/user-attachments/assets/03c53f8f-8843-463b-a4b2-2a7f9172b5e9" />)
 
 ### Search section with resume evaluation history
-![Detailed Analysis](<img width="1919" height="838" alt="image" src="https://github.com/user-attachments/assets/f1cf1bff-5f3e-4ac4-adc2-5aff094101be" />)
+(<img width="1919" height="838" alt="image" src="https://github.com/user-attachments/assets/f1cf1bff-5f3e-4ac4-adc2-5aff094101be" />)
 
 ---
 
@@ -149,5 +149,5 @@ This project is licensed under the MIT License.
 
 ## Contributions
 My team mates !
--- Parnika Deepak Bhat (parnika0905@gmail.com)
--- Revathi R (revathimaniraj12@gmail.com)
+- Parnika Deepak Bhat (parnika0905@gmail.com)
+- Revathi R (revathimaniraj12@gmail.com)
