@@ -9,7 +9,7 @@
 
 ---
 
-An **AI-powered recruitment co-pilot** designed to automate, analyze, and enrich the resume evaluation process.
+An **AI-powered recruitment co-pilot** designed to automate, analyze, and enrich the resume evaluation process. Find the demo here : (https://resumerelevance-vukwt3mmq9b6u6q5jnuxae.streamlit.app/)
 
 ---
 
@@ -137,7 +137,8 @@ Runs Flask server on http://127.0.0.1:5000.
 # Open new terminal & activate environment
 streamlit run dashboard.py
 ```
-
+## Demo
+You can check out our app at [https://resumerelevance-vukwt3mmq9b6u6q5jnuxae.streamlit.app/] live.
 ## License
 This project is licensed under the MIT License.
 
